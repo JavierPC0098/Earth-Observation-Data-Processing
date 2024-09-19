@@ -1,2 +1,2 @@
-# Earth-Observation-Data-Processing
-Test
+# eodp
+EODP main repository
