@@ -11,6 +11,8 @@ from common.plot.plotMat2D import plotMat2D
 from common.plot.plotF import plotF
 from scipy.signal import convolve2d
 from common.src.auxFunc import getIndexBand
+from l1b.test.l1b_test import alt_toa_extractor
+
 
 class opticalPhase(initIsm):
 
@@ -25,7 +27,7 @@ class opticalPhase(initIsm):
         :return: TOA image in irradiances [mW/m2/nm],
                     with spatial and spectral filter
         """
-        self.logger.info("EODP-ALG-ISM-1000: Optical stage")
+        self.logger.info("EODP-ALG-ISM-1000: Optical stage") # name of the algorith to be used
 
         # Calculation and application of the ISRF
         # -------------------------------------------------------------------------------
@@ -93,7 +95,12 @@ class opticalPhase(initIsm):
         :return: TOA image in irradiances [mW/m2]
         """
         # TODO
-        return toa
+        # pag 34.
+        # here we integrate all the energy commint to teh telescope
+
+        toa_irradiance = Tr * toa * ( D / f )**4 * np.pi/4
+
+        return toa_irradiance
 
 
     def applySysMtf(self, toa, Hsys):
@@ -104,6 +111,7 @@ class opticalPhase(initIsm):
         :return: TOA image in irradiances [mW/m2]
         """
         # TODO
+
         return toa_ft
 
     def spectralIntegration(self, sgm_toa, sgm_wv, band):
@@ -115,6 +123,26 @@ class opticalPhase(initIsm):
         :return: TOA image 2D in radiances [mW/m2]
         """
         # TODO
-        return toa
+        isrf, wv_isrf = readIsrf(self.auxdir + self.ismConfig.isrffile, band)
+        wv_isrf = wv_isrf * 1000 # we want to work in nm
+        nrow_alt, ncol_act, nwvs = sgm_toa.shape
+        isrf_step = wv_isrf[1] - wv_isrf[0] # 0.001  # compute the delta wv from here sgm_wv
+        toa_filtered = np.zeros((nrow_alt, ncol_act))
+
+
+        # Appliying the filter. We normalize it first. Eq. pag 33
+        isfr_int = np.sum(isrf) * isrf_step
+        isfr_norm = isrf / isfr_int
+
+        for ialt in range(nrow_alt) :
+            for iact in range(ncol_act):
+                # We compute the TOA Eq. pag 32
+                cs = interp1d(sgm_wv, sgm_toa[ialt, iact, :], fill_value=(0, 0), bounds_error=False)
+                toa_interpolated = cs(wv_isrf) # to do the unit conversion from microns to nanometers
+
+                # Apply the filter. Pag 32
+                toa_filtered[ialt, iact] = np.sum(toa_interpolated * isfr_norm * isrf_step)
+
+        return toa_filtered
 
 

@@ -114,4 +114,8 @@ toa_plot_comparator(eodp_toa_alt_row_student_list, eodp_toa_alt_row_isfr_list,
 #  Do another run of the L1B with the equalization enabled to false. Plot the restored signal for this case
 # and for the case with the equalization set to True. Compare.
 
+# Run Manually twice to complete this
+
+
+
 
