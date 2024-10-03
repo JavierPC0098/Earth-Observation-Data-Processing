@@ -112,6 +112,11 @@ class opticalPhase(initIsm):
         """
         # TODO
 
+        GE = fft2(toa) # image in the frequency domain
+        # fftshift(Hsys) # frequency shifted. Reorders the frequencies to put the value 1 in the first pixel (top left corner)
+
+        toa_ft = np.real(ifft2( GE * fftshift(Hsys)))
+
         return toa_ft
 
     def spectralIntegration(self, sgm_toa, sgm_wv, band):
