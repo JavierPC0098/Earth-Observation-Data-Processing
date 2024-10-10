@@ -4,6 +4,7 @@ import numpy as np
 from common.io.writeToa import writeToa
 from common.plot.plotMat2D import plotMat2D
 from common.plot.plotF import plotF
+from scipy.constants import Planck, c
 
 class detectionPhase(initIsm):
 
@@ -105,6 +106,11 @@ class detectionPhase(initIsm):
         :return: Toa in photons
         """
         #TODO
+
+        E_in = toa * area_pix * tint
+        E_ph = Planck * c / wv
+        toa_ph = E_in / E_ph
+
         return toa_ph
 
     def phot2Electr(self, toa, QE):
@@ -115,6 +121,9 @@ class detectionPhase(initIsm):
         :return: toa in electrons
         """
         #TODO
+
+        toae = toa * QE
+
         return toae
 
     def badDeadPixels(self, toa,bad_pix,dead_pix,bad_pix_red,dead_pix_red):
@@ -128,6 +137,11 @@ class detectionPhase(initIsm):
         :return: toa in e- including bad & dead pixels
         """
         #TODO
+
+
+        idx_bad = range(5, toa_act, step_bad)  # Distribute evenly in the CCD
+        idx_dead = range(0, toa_act, step_dead)
+
         return toa
 
     def prnu(self, toa, kprnu):
@@ -138,6 +152,12 @@ class detectionPhase(initIsm):
         :return: TOA after adding PRNU [e-]
         """
         #TODO
+
+        PRNU = np.random.normal(loc=0.0, scale=1.0) * kprnu
+        toa_col = toa.shape[1]
+        for act in range(toa_col):
+            toa[:, act] = toa[:, act] * (1 + PRNU[act])
+
         return toa
 
 
@@ -153,4 +173,27 @@ class detectionPhase(initIsm):
         :return: TOA in [e-] with dark signal
         """
         #TODO
+
+        Sd = ds_A_coeff * (T / Tref) ** 3 * np.exp(-ds_B_coeff * (1 / T - 1 / Tref))
+
+        DSNU(act) = np.abs(np.random.normal(loc=0.0, scale=1.0)) * kdsnu
+        DS(act) = Sd * (1 + DSNU(act))
+        N_e[:, act] = N_e[:, act] + DS(act)
+
         return toa
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
