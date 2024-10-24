@@ -72,7 +72,14 @@ class videoChainPhase(initIsm):
         """
         #TODO
 
+        # Calculate the maximum possible digital value based on bit depth
+        max_digital_value = 2 ** bit_depth - 1
+
+        # Apply the digitization formula
         toa_dn = np.round((toa / (max_voltage - min_voltage))*(2**bit_depth - 1))
+
+        # Saturate the value to ensure it's within the valid range
+        toa_dn = np.clip(toa_dn, 0, max_digital_value)
 
         return toa_dn
 

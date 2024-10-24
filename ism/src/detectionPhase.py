@@ -138,9 +138,9 @@ class detectionPhase(initIsm):
         """
         #TODO
 
+        # There are no bad pixels, therefore, no code is developed for this
 
-        idx_bad = range(5, toa_act, step_bad)  # Distribute evenly in the CCD
-        idx_dead = range(0, toa_act, step_dead)
+        toa[:, 4] *= 0.9 # Attenuate the values in the 5th column by 10%
 
         return toa
 
@@ -153,10 +153,10 @@ class detectionPhase(initIsm):
         """
         #TODO
 
-        PRNU = np.random.normal(loc=0.0, scale=1.0) * kprnu
+        normal = np.random.normal(0.,1.,toa.shape[1])
         toa_col = toa.shape[1]
         for act in range(toa_col):
-            toa[:, act] = toa[:, act] * (1 + PRNU[act])
+            toa[:, act] = toa[:, act] * (1+normal[act]*kprnu)
 
         return toa
 
@@ -176,24 +176,10 @@ class detectionPhase(initIsm):
 
         Sd = ds_A_coeff * (T / Tref) ** 3 * np.exp(-ds_B_coeff * (1 / T - 1 / Tref))
 
-        DSNU(act) = np.abs(np.random.normal(loc=0.0, scale=1.0)) * kdsnu
-        DS(act) = Sd * (1 + DSNU(act))
-        N_e[:, act] = N_e[:, act] + DS(act)
+        Ds = Sd*(1 + np.abs(np.random.normal(0,1,toa.shape[1])*kdsnu))
+
+        for act in range(toa.shape[1]):
+            toa[:, act] = toa[:, act] + Ds[act]
 
         return toa
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
