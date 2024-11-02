@@ -16,7 +16,8 @@ eodp_l1b_toa_VNIR_isfr= ['ism_toa_isrf_VNIR-0.nc', 'ism_toa_isrf_VNIR-1.nc', 'is
 
 # Load the data
 indir = r"C:\\Users\\pc\\Desktop\\Earth_Observation_Data_Processing\\EODP_TER_2021\\EODP-TS-L1B\\input"
-outdir_student = r"C:\\Users\\pc\\Desktop\\Earth_Observation_Data_Processing\\EODP_TER_2021\\EODP-TS-L1B\\myoutputs"
+outdir_student = r"C:\\Users\\pc\\Desktop\\Earth_Observation_Data_Processing\\EODP_TER_2021\\EODP-TS-L1B\\myoutputs_eq_true"
+outdir_eq_false = r"C:\\Users\\pc\\Desktop\\Earth_Observation_Data_Processing\\EODP_TER_2021\\EODP-TS-L1B\\myoutputs_eq_false"
 outdir_lucia = r"C:\\Users\\pc\\Desktop\\Earth_Observation_Data_Processing\\EODP_TER_2021\\EODP-TS-L1B\\output"
 outdir_isfr = r"C:\\Users\\pc\\Desktop\\Earth_Observation_Data_Processing\\EODP_TER_2021\\EODP-TS-L1B\\input"
 
@@ -86,35 +87,39 @@ def toa_plot_comparator(toa_alt_row_student_list, toa_alt_row_isfr_list, label_1
 
 #####################################################################################################################
 # Exercise 1
-# Check for all bands that the differences with respect to the output TOA (l1b_toa_) are <0.01% for at
-# least 3-sigma of the points.
+# Check for all bands that the differences with respect to the output TOA (l1b_toa_) are <0.01% for at least 3-sigma of the points.
 # Load of the data
 eodp_toa_files_student = np.array(data_saver(outdir_student, eodp_l1b_toa_VNIR))
 eodp_toa_files_lucia = np.array(data_saver(outdir_lucia, eodp_l1b_toa_VNIR))
 
 # Compute the 3-sigma
+print("Matrix comparation difference")
 sigma3_toa_diff(eodp_toa_files_student, eodp_toa_files_lucia, eodp_toa_tolerance)
 
 #####################################################################################################################
 # Exercise 2
-#  For the central ALT position, plot the restored signal (l1b_toa), and the TOA after the ISRF
-# (ism_toa_isrf). Explain the differences.
+#  For the central ALT position, plot the restored signal (l1b_toa), and the TOA after the ISRF (ism_toa_isrf). Explain the differences.
 eodp_toa_files_isfr = np.array(data_saver(outdir_isfr, eodp_l1b_toa_VNIR_isfr))
 
 eodp_toa_alt_row_student_list = alt_toa_extractor(eodp_toa_files_student)
 eodp_toa_alt_row_isfr_list = alt_toa_extractor(eodp_toa_files_isfr)
 
 toa_plot_comparator(eodp_toa_alt_row_student_list, eodp_toa_alt_row_isfr_list,
-                    'ALT TOA (Student)', 'ALT TOA (ISFR)',
+                    'TOA Restored Signal', 'TOA after ISRF',
                     'ACT pixel [-]', 'TOA [mW/m2/sr]',
                     'Effects of TOA with and without ISFR.')
 
 #####################################################################################################################
 # Exercise 3
-#  Do another run of the L1B with the equalization enabled to false. Plot the restored signal for this case
-# and for the case with the equalization set to True. Compare.
+#  Do another run of the L1B with the equalization enabled to false. Plot the restored signal for this case and for the case with the equalization set to True. Compare.
 
-# Run Manually twice to complete this
+eodp_toa_files_eq_false = np.array(data_saver(outdir_eq_false, eodp_l1b_toa_VNIR))
+eodp_toa_alt_row_eq_false = alt_toa_extractor(eodp_toa_files_eq_false)
+
+toa_plot_comparator(eodp_toa_alt_row_student_list, eodp_toa_alt_row_eq_false,
+                    'TOA with equalization', 'TOA without equalization',
+                    'ACT pixel [-]', 'TOA [mW/m2/sr]',
+                    'Effects of TOA with and without Equalization.')
 
 
 
