@@ -11,10 +11,39 @@ import matplotlib.pyplot as plt
 from scipy.special import j1
 from numpy.matlib import repmat
 from common.io.readMat import writeMat
+from common.io.mkdirOutputdir import mkdirOutputdir
 from common.plot.plotMat2D import plotMat2D
 from scipy.interpolate import interp2d
 from numpy.fft import fftshift, ifft2
 import os
+from netCDF4 import Dataset
+
+def writeArray(outputdir, name, array):
+
+    # Check output directory
+    mkdirOutputdir(outputdir)
+
+    # TOA filename
+    savetostr = os.path.join(outputdir, name + '.nc')
+
+    # open a netCDF file to write
+    ncout = Dataset(savetostr, 'w', format='NETCDF4')
+
+    # define axis size
+    ncout.createDimension('alt_lines', array.shape[0])  # unlimited
+    #ncout.createDimension('act_columns', mat.shape[1])
+
+    # create variable array
+    floris_toa_scene = ncout.createVariable('array', 'float32',
+                                            ('alt_lines'))
+
+    # Assign data
+    floris_toa_scene[:]         = array[:]
+
+    # close files
+    ncout.close()
+
+    print("Finished writting: " + savetostr)
 
 class mtf:
     """
@@ -80,6 +109,15 @@ class mtf:
         # Plot cuts ACT/ALT of the MTF
         self.plotMtf(Hdiff, Hdefoc, Hwfe, Hdet, Hsmear, Hmotion, Hsys, nlines, ncolumns, fnAct, fnAlt, directory, band)
 
+        writeMat(self.outdir, 'Hdiff_' + band, Hdiff)
+        writeMat(self.outdir, 'Hdefoc_' + band, Hdefoc)
+        writeMat(self.outdir, 'Hwfe_' + band, Hwfe)
+        writeMat(self.outdir, 'Hdet_' + band, Hdet)
+        writeMat(self.outdir, 'Hsmear_' + band, Hsmear)
+        writeMat(self.outdir, 'Hmotion_' + band, Hmotion)
+        writeMat(self.outdir, 'Hsys_' + band, Hsys)
+        writeArray(self.outdir, 'fnAct_' + band, fnAct)
+        writeArray(self.outdir, 'fnAlt_' + band, fnAlt)
 
         return Hsys
 
