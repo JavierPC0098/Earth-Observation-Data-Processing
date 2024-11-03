@@ -96,9 +96,11 @@ class opticalPhase(initIsm):
         """
         # TODO
         # pag 34.
-        # here we integrate all the energy commint to teh telescope
+        # here we integrate all the energy commint to the telescope
 
         toa_irradiance = Tr * toa * ( D / f )**4 * np.pi/4
+        irradiance_conv_factor = Tr * ( D / f )**4 * np.pi/4
+        print(f" -+-+- Irradiance Conversion factor: {irradiance_conv_factor:.10f}")
 
         return toa_irradiance
 

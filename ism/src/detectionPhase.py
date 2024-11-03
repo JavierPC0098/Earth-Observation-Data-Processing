@@ -111,6 +111,10 @@ class detectionPhase(initIsm):
         E_ph = Planck * c / wv
         toa_ph = E_in / E_ph
 
+        irr2ph = area_pix * tint * wv / (Planck * c)
+        print("----------------------------------------------------------------------------------------------")
+        print(f"Irradiation to Photons: {irr2ph:.8f}")
+
         return toa_ph
 
     def phot2Electr(self, toa, QE):
@@ -123,6 +127,9 @@ class detectionPhase(initIsm):
         #TODO
 
         toae = toa * QE
+
+        print("----------------------------------------------------------------------------------------------")
+        print(f"Photons to Electrons: {QE:.8f}")
 
         return toae
 

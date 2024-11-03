@@ -59,6 +59,9 @@ class videoChainPhase(initIsm):
 
         toa = toa * OCF * gain_adc
 
+        print("----------------------------------------------------------------------------------------------")
+        print(f"Electrons to Volts: {OCF * gain_adc:.8f}")
+
         return toa
 
     def digitisation(self, toa, bit_depth, min_voltage, max_voltage):
@@ -78,8 +81,23 @@ class videoChainPhase(initIsm):
         # Apply the digitization formula
         toa_dn = np.round((toa / (max_voltage - min_voltage))*(2**bit_depth - 1))
 
+        v2dig = np.round((1 / (max_voltage - min_voltage)) * (2 ** bit_depth - 1))
+        print("----------------------------------------------------------------------------------------------")
+        print(f"Volts to digital: {v2dig:.8f}")
+
         # Saturate the value to ensure it's within the valid range
         toa_dn = np.clip(toa_dn, 0, max_digital_value)
+
+        # Calculate the number of pixels that are saturated
+        saturated_pixels = np.sum(toa_dn == max_digital_value)
+
+        # Calculate the total number of pixels in the matrix
+        total_pixels = toa_dn.size
+
+        # Calculate the percentage of saturated pixels
+        saturated_percentage = (saturated_pixels / total_pixels) * 100
+
+        print(f" -+-+-+- Percentage of saturated pixels: {saturated_percentage:.2f}%")
 
         return toa_dn
 
